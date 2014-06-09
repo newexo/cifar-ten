@@ -1,7 +1,7 @@
 cifar-ten
 =========
 
-Studio 415 ml meetup.
+This project began as part of the Studio 415 ML Meetup. I am forever grateful Steven Webster and his XD team for providing the space we used when we were first meeting.
 
 Download the data
 -----------------
@@ -20,7 +20,7 @@ Required python packages
 
 Currently the python scripts in `code` require packages numpy, scipy, Theano and PyWavelets. To install these packages system-wide, invoke
   * `sudo pip install Theano`
-  * `sudo pip install PyWavelets`
+  * `sudo pip install pywavelets --no-deps`
 
 If local installation is sufficient or preferred, invoke `pip` with the `--user` flag. 
 
