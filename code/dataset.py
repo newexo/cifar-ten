@@ -9,6 +9,7 @@ import theano.tensor as T
 import cifar10
 import mnist
 import cifarDirectories
+import preprocess
 
 class Dataset(object):
     def __init__(self, train, valid, test):
@@ -37,45 +38,55 @@ class Dataset(object):
 def xy(batch):
     return batch['data'], batch['labels']
 
-def ng(data):
-    x, y = data
-    return x / 255.0, y
-
-def cifar10ThreeBatch():
-    batch1 = cifar10.batch1()
-    batch2 = cifar10.batch2()
-    batch3 = cifar10.batch3()
-    x = numpy.vstack([batch1['data'], batch2['data'], batch3['data']])
-    y = numpy.concatenate([batch1['labels'], batch2['labels'], batch3['labels']])
-    return x, y
-
-def mix(data):
-    from preprocess import dwtFftFeatures as feat
-    from preprocess import reconstruct as recon
-    x, y = data
-    z = [feat(recon(a, (32, 32))) for a in x]
-    return z, y
-
-class Cifar10Part(Dataset):
+class Cifar10PartRaw(object):
     def __init__(self):
-        train = xy(cifar10.batch1())
-        valid = xy(cifar10.batch4())
-        test = xy(cifar10.batch5())
-        Dataset.__init__(self, ng(train), ng(valid), ng(test))
+        self.train = xy(cifar10.batch1())
+        self.valid = xy(cifar10.batch4())
+        self.test = xy(cifar10.batch5())
+
+class Cifar10AllRaw(Dataset):
+    def __init__(self):
+        batch1 = cifar10.batch1()
+        batch2 = cifar10.batch2()
+        batch3 = cifar10.batch3()
+        x = numpy.vstack([batch1['data'], batch2['data'], batch3['data']])
+        y = numpy.concatenate([batch1['labels'], batch2['labels'], batch3['labels']])
+        self.train = x, y
+        self.valid = xy(cifar10.batch4())
+        self.test = xy(cifar10.batch5())
         
-class Cifar10All(Dataset):
-    def __init__(self):
-        train = cifar10ThreeBatch()
-        valid = xy(cifar10.batch4())
-        test = xy(cifar10.batch5())
-        Dataset.__init__(self, ng(train), ng(valid), ng(test))
+class CifarData(Dataset):
+    def __init__(self, raw):
+        def ng(data):
+            x, y = data
+            return numpy.array(x / 255.0, dtype = numpy.float32), y
+
+        Dataset.__init__(self, ng(raw.train), ng(raw.valid), ng(raw.test))
         
-class Cifar10PartTransform(Dataset):
-    def __init__(self):
-        train = xy(cifar10.batch1())
-        valid = xy(cifar10.batch4())
-        test = xy(cifar10.batch5())
-        Dataset.__init__(self, mix(train), mix(valid), mix(test))
+class CifarTransformedData(Dataset):
+    def __init__(self, raw):
+        train = self.mix(raw.train)
+        test = self.mix(raw.test)
+        valid = self.mix(raw.valid)
+
+        self.mu, self.sigma = preprocess.muSigma(train[0])
+
+        Dataset.__init__(self, self.normalize(train), 
+                            self.normalize(valid),
+                            self.normalize(test))
+
+    def mix(self, data):
+        def mixRow(row):
+            return preprocess.dwtFftFeatures(preprocess.reconstruct(row, (32, 32)))
+                
+        x, y = data
+        z = [mixRow(row) for row in x]
+        return z, y
+
+    def normalize(self, data):
+        x, y = data
+        z = preprocess.sigmoid(preprocess.normalize(x, self.mu, self.sigma))
+        return numpy.array(z, dtype = numpy.float32), y        
     
 class Mnist(Dataset):
     def __init__(self):
