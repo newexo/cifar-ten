@@ -34,29 +34,48 @@ class Dataset(object):
         self.n_in = len(self.train[0][0])
         self.n_out = max(self.train[1]) + 1
 
+def xy(batch):
+    return batch['data'], batch['labels']
+
+def ng(data):
+    x, y = data
+    return x / 255.0, y
+
+def cifar10ThreeBatch():
+    batch1 = cifar10.batch1()
+    batch2 = cifar10.batch2()
+    batch3 = cifar10.batch3()
+    x = numpy.vstack([batch1['data'], batch2['data'], batch3['data']])
+    y = numpy.concatenate([batch1['labels'], batch2['labels'], batch3['labels']])
+    return x, y
+
+def mix(data):
+    from preprocess import dwtFftFeatures as feat
+    from preprocess import reconstruct as recon
+    x, y = data
+    z = [feat(recon(a, (32, 32))) for a in x]
+    return z, y
+
 class Cifar10Part(Dataset):
     def __init__(self):
-        batch = cifar10.batch1()
-        train = batch['data'] / 256.0, batch['labels']
-        batch = cifar10.batch2()
-        valid = batch['data'] / 256.0, batch['labels']
-        batch = cifar10.batch3()
-        test = batch['data'] / 256.0, batch['labels']
-        Dataset.__init__(self, train, valid, test)
-
-class CifarFeatures(Dataset):
-    def __init__(self, cifarDataset):
-        def transform(data):
-            from preprocess import dwtFftFeatures as feat
-            from preprocess import reconstruct as recon
-            x, y = data
-            z = [feat(recon(a, (32, 32))) for a in x]
-            return z, y
-            
-        train = transform(cifarDataset.train)
-        valid = transform(cifarDataset.valid)
-        test = transform(cifarDataset.test)
-        Dataset.__init__(self, train, valid, test)
+        train = xy(cifar10.batch1())
+        valid = xy(cifar10.batch4())
+        test = xy(cifar10.batch5())
+        Dataset.__init__(self, ng(train), ng(valid), ng(test))
+        
+class Cifar10All(Dataset):
+    def __init__(self):
+        train = cifar10ThreeBatch()
+        valid = xy(cifar10.batch4())
+        test = xy(cifar10.batch5())
+        Dataset.__init__(self, ng(train), ng(valid), ng(test))
+        
+class Cifar10PartTransform(Dataset):
+    def __init__(self):
+        train = xy(cifar10.batch1())
+        valid = xy(cifar10.batch4())
+        test = xy(cifar10.batch5())
+        Dataset.__init__(self, mix(train), mix(valid), mix(test))
     
 class Mnist(Dataset):
     def __init__(self):
@@ -65,6 +84,18 @@ class Mnist(Dataset):
 
 class Iris(Dataset):
     def __init__(self):
+        class Subdata(object):
+            def __init__(self):
+                self.x = []
+                self.y = []
+                
+            def append(self, x, y):
+                self.x.append(x)
+                self.y.append(y)
+                
+            def array(self):
+                return numpy.array(self.x, dtype=numpy.float32), numpy.array(self.y)
+
         def irisType(iris):
             if iris == 'Iris-setosa': return 0
             if iris == 'Iris-versicolor': return 1
@@ -76,12 +107,9 @@ class Iris(Dataset):
         maxPetalLength = 6.9
         maxPetalWidth = 2.5
 
-        xTrain = []
-        yTrain = []
-        xTest = []
-        yTest = []
-        xValid = []
-        yValid = []
+        train = Subdata()
+        test = Subdata()
+        valid = Subdata()
 
         randomState = random.getstate()
         random.seed(42)
@@ -98,19 +126,13 @@ class Iris(Dataset):
                 y = irisType(row[4])
                 r = random.random()
                 if r < 0.8:
-                    xTrain.append(x)
-                    yTrain.append(y)
+                    train.append(x, y)
                 elif r < 0.9:
-                    xTest.append(x)
-                    yTest.append(y)
+                    test.append(x, y)
                 else:
-                    xValid.append(x)
-                    yValid.append(y)
+                    valid.append(x, y)
         f.close()
         random.setstate(randomState)
         
-        train = numpy.array(xTrain, dtype=numpy.float32), numpy.array(yTrain)
-        test = numpy.array(xTest, dtype=numpy.float32), numpy.array(yTest)
-        valid = numpy.array(xValid, dtype=numpy.float32), numpy.array(yValid)
-        Dataset.__init__(self, train, valid, test)
+        Dataset.__init__(self, train.array(), valid.array(), test.array())
 
