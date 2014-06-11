@@ -19,7 +19,17 @@ def reconstruct(arr, size):
     imb = Image.fromstring('L', size, arr[2*n:3*n].tostring(), 'raw')
     return Image.merge('RGB', (imr, img, imb))
 
-def normalize(image):
+def muSigma(x):
+    # compute the means and standard deviations of each of the features
+    mu = numpy.mean(x, axis=0)
+    sigma = numpy.std(x, axis=0)
+    
+    return mu, sigma
+
+def normalize(x, mu, sigma):
+    return numpy.array([(row - mu) / sigma for row in x])
+
+def normalizeImage(image):
     # find the dimensions of image, which is assumed to be square
     n = image.size[0]
     
@@ -47,7 +57,7 @@ def dwtFftFeatures(image):
     # find the dimensions of image, which is assumed to be square
     n = image.size[0]
 
-    arr = normalize(image)
+    arr = normalizeImage(image)
     
     # compute the 2d Fourier transform of each channel and flatten into features
     f = conflatten([abs(fft.fft2(a)) / (n * n) for a in arr])
@@ -60,4 +70,7 @@ def dwtFftFeatures(image):
 
 def loadImageFeatures(name):
     return dwtFftFeatures(load(name))
-    
+
+def sigmoid(t):
+    return 1 / (1 + numpy.exp(-t))
+
