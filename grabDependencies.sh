@@ -17,6 +17,14 @@ function downloadFiles()
     pushd .
     cd data
 
+    if [ -e iris.data ]
+    then
+        echo Iris data set already downloaded.
+    else
+        curl http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data > iris.data
+    fi
+
+
     if [ -e mnist.pkl.gz ]
     then
         echo MNIST data set already downloaded.
