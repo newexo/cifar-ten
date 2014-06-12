@@ -12,7 +12,7 @@ import cifarDirectories
 sys.path.append(cifarDirectories.DeepLearningTutorialsCode())
 from DBN import DBN
 
-import dataset
+from dataset import *
 from hyperparameter import HyperparametersDBN
 
 def test_DBN(dataset, hyper):
@@ -41,7 +41,7 @@ def test_DBN(dataset, hyper):
 
     for i in xrange(dbn.n_layers):
         for epoch in xrange(hyper.pretrainingEpochs):
-            print 'Pretraining epoch ', epoch, ', time ', (time.time() - start_time) / 60.0
+            print 'Pretraining epoch %d, time %.2f' % (epoch, (time.time() - start_time) / 60.0)
             c = []
             for batch_index in xrange(n_train_batches):
                 c.append(pretraining_fns[i](index=batch_index,
@@ -50,7 +50,7 @@ def test_DBN(dataset, hyper):
             print numpy.mean(c)
 
     end_time = time.time()
-    print 'The pretraining code for file ', os.path.split(__file__)[1], ' ran for %.2fm' % ((end_time - start_time) / 60.0)
+    print 'The pretraining code for file ' + os.path.split(__file__)[1] + ' ran for %.2fm' % ((end_time - start_time) / 60.0)
 
     print '... getting the finetuning functions'
     train_fn, validate_model, test_model = dbn.build_finetune_functions(
@@ -72,7 +72,7 @@ def test_DBN(dataset, hyper):
 
     while (epoch < hyper.numberEpochs) and (not done_looping):
         epoch = epoch + 1
-	print "Finetuning epoch ", epoch, ", time ", (time.time() - start_time) / 60.0 
+	print 'Finetuning epoch %d, time %.2f' % (epoch, (time.time() - start_time) / 60.0)
         for minibatch_index in xrange(n_train_batches):
 
             minibatch_avg_cost = train_fn(minibatch_index)
@@ -82,7 +82,7 @@ def test_DBN(dataset, hyper):
 
                 validation_losses = validate_model()
                 this_validation_loss = numpy.mean(validation_losses)
-                print('epoch %i, minibatch %i/%i, validation error %f %%' % \
+                print('epoch %i, minibatch %i/%i, validation error %.2f %%' % \
                       (epoch, minibatch_index + 1, n_train_batches,
                        this_validation_loss * 100.))
 
@@ -98,7 +98,7 @@ def test_DBN(dataset, hyper):
                     test_losses = test_model()
                     test_score = numpy.mean(test_losses)
                     print(('     epoch %i, minibatch %i/%i, test error of '
-                           'best model %f %%') %
+                           'best model %.2f %%') %
                           (epoch, minibatch_index + 1, n_train_batches,
                            test_score * 100.))
 
@@ -107,8 +107,8 @@ def test_DBN(dataset, hyper):
                 break
 
     end_time = time.time()
-    print(('Optimization complete with best validation score of %f %%,'
-           'with test performance %f %%') %
+    print(('Optimization complete with best validation score of %.2f %%,'
+           'with test performance %.2f %%') %
                  (best_validation_loss * 100., test_score * 100.))
     print('The fine tuning code for file ' +
                           os.path.split(__file__)[1] +
@@ -117,7 +117,8 @@ def test_DBN(dataset, hyper):
 
 
 if __name__ == '__main__':
-    #test_DBN(dataset.Mnist(), HyperparametersDBN(numberEpochs = 10, pretrainingEpochs = 2))
-    #test_DBN(dataset.Mnist(), HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 10, nHidden=[5000, 5000, 5000]))
-    test_DBN(dataset.Cifar10Part(), HyperparametersDBN(pretrainingEpochs = 100, numberEpochs=1000, nHidden=[5000, 5000, 5000]))
+    test_DBN(Mnist(), HyperparametersDBN(numberEpochs = 2, pretrainingEpochs = 1))
+    #test_DBN(Mnist(), HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 10, nHidden=[5000, 5000, 5000]))
+    #test_DBN(CifarData(Cifar10PartRaw()), HyperparametersDBN(pretrainingEpochs = 1, numberEpochs=1, nHidden=[1000]))
+    #test_DBN(CifarTransformedData(Cifar10PartRaw()), HyperparametersDBN(pretrainingEpochs = 1, numberEpochs=1, nHidden=[1000]))
 
