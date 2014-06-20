@@ -61,7 +61,7 @@ def test_mlp(dataset, hyper):
                 x: valid_set_x[index * hyper.batchSize:(index + 1) * hyper.batchSize],
                 y: valid_set_y[index * hyper.batchSize:(index + 1) * hyper.batchSize]})
 
-    # compute the gradient of cost with respect to theta (sotred in params)
+    # compute the gradient of cost with respect to theta (stored in params)
     # the resulting gradients will be stored in a list gparams
     gparams = []
     for param in classifier.params:
