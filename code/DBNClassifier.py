@@ -115,10 +115,56 @@ def test_DBN(dataset, hyper):
                           ' ran for %.2fm' % ((end_time - start_time)
                                               / 60.))
 
+def transformed():
+    from transform import datasetEightByEight
+    raw = Cifar10PartRaw()
+    datasetEightByEight(raw)
+    data = CifarData(raw)
+
+    print 'test 1'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 10, pretrainingEpochs = 10, nHidden=[200, 200]))
+
+    print 'test 2'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 100, nHidden=[200, 200]))
+
+    print 'test 3'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 500, nHidden=[200, 200]))
+
+    print 'test 4'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 10, pretrainingEpochs = 10, nHidden=[500, 500]))
+
+    print 'test 5'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 100, nHidden=[500, 500]))
+
+    print 'test 6'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 500, nHidden=[500, 500]))
+
+    print 'test 7'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 10, pretrainingEpochs = 10, nHidden=[1000, 1000]))
+
+    print 'test 8'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 100, nHidden=[1000, 1000]))
+
+    print 'test 9'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 500, nHidden=[1000, 1000]))
+
+    print 'test 10'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 10, pretrainingEpochs = 10, nHidden=[100, 50]))
+
+    print 'test 11'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 100, nHidden=[100, 50]))
+
+    print 'test 12'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 500, nHidden=[100, 500]))
+
+    print 'test 13'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 10, pretrainingEpochs = 10, nHidden=[300, 100, 50]))
+
+    print 'test 14'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 100, nHidden=[300, 100, 50]))
+
+    print 'test 15'    
+    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 500, nHidden=[300, 100, 500]))
 
 if __name__ == '__main__':
-    test_DBN(Mnist(), HyperparametersDBN(numberEpochs = 2, pretrainingEpochs = 1))
-    #test_DBN(Mnist(), HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 10, nHidden=[5000, 5000, 5000]))
-    #test_DBN(CifarData(Cifar10PartRaw()), HyperparametersDBN(pretrainingEpochs = 1, numberEpochs=1, nHidden=[1000]))
-    #test_DBN(CifarTransformedData(Cifar10PartRaw()), HyperparametersDBN(pretrainingEpochs = 1, numberEpochs=1, nHidden=[1000]))
-
+    transformed()
