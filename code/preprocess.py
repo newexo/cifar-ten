@@ -12,12 +12,21 @@ def load(name):
     path = os.path.join(os.environ['CIFIR_DATA_DIR'], 'train', str(name) + '.png')
     return Image.open(path)
 
+def grayscale(img):
+    return img.convert('L')
+    
+def image2narray(img):
+    return numpy.fromstring(img.tostring(), numpy.uint8)
+
+def narray2image(arr, size):
+    return Image.fromstring('L', size, arr.tostring(), 'raw')
+
 def reconstruct(arr, size):
     n = size[0] * size[1]
-    imr = Image.fromstring('L', size, arr[0:n].tostring(), 'raw')
-    img = Image.fromstring('L', size, arr[n:2*n].tostring(), 'raw')
-    imb = Image.fromstring('L', size, arr[2*n:3*n].tostring(), 'raw')
-    return Image.merge('RGB', (imr, img, imb))
+    red = narray2image(arr[0:n], size)
+    green = narray2image(arr[n:2*n], size)
+    blue = narray2image(arr[2*n:3*n], size)
+    return Image.merge('RGB', (red, green, blue))
 
 def muSigma(x):
     # compute the means and standard deviations of each of the features
@@ -34,7 +43,7 @@ def normalizeImage(image):
     n = image.size[0]
     
     # construct a list of three arrays, one for each channel RGB, RGBA, etc.
-    arr = [numpy.fromstring(i.tostring(), numpy.uint8) for i in image.split()]
+    arr = [image2narray(img) for img in image.split()]
     
     # mean normalize the arrays
     flat = numpy.concatenate(arr)
@@ -73,4 +82,5 @@ def loadImageFeatures(name):
 
 def sigmoid(t):
     return 1 / (1 + numpy.exp(-t))
+
 

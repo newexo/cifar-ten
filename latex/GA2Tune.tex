@@ -1,0 +1,99 @@
+\documentclass[letterpaper,11pt,reqno]{amsart}
+
+\input{MathMacros}
+\usepackage{hyperref}
+
+\begin{document}
+
+\author{Authors TBD}
+\title{Tuning DBN hyper-parameters using a genetic algorithm}
+\date{\today}
+\maketitle
+
+\section{Introduction}
+
+Deep belief networks (DBNs) are neural networks which are first pre-trained in a greedy layer wise manner using Boltzmann learning and then fine tuned using back-propagation. DBN’s implement state of the art image and speech recognition. While the results can be impressive, 
+
+The significant increase in performance of these DBNs over traditional neural networks comes at a cost of an increase of hyper-parameters which must be tuned to ensure even good performance. The process of tuning these hyper-parameters can be tedious, time consuming and expensive. Even worse, whether a set hyper-parameters works well also may depend on what hardware is used to train the classifier.
+
+
+\section{Laundry list of hyper-parameters}
+
+Random Seed 
+
+Classifier learn rate 
+
+Classifier l2-penalty 
+
+Classifier l1-penalty 
+
+Number of layers (n. layers) 
+
+Number of hidden units (n. hidden-units) 
+
+(Mini) Batch size 
+
+Weight initialization method 
+
+CD epochs
+
+CD learn rate 
+
+Convolution networks: (additional constraint on the weights)? 
+
+Cost Function
+
+Layer by layer fitness function evaluation
+
+Activation function
+
+Pre processing strategy: PCA, Fourier Transform, et al.  
+
+Defining the hyper-parameters: 
+
+As identified Supra. We will define each hyper parameter to clarify the process in which it’s assigned. 
+
+Random Seed –  a selection of random numbers or vectors that is used to generate pseudo-random numbers.
+
+Classifier Learn Rate – how quickly a gradient moves when updating any given weight. 
+
+Classifier L2-penalty –  a term that is added to the cost function to ensure regularization. 
+
+Classifier L1-penalty –  a second term that is added to the cost function to ensure regularization. 
+
+Number of layers – Roughly corresponds to the level of hierarchical abstraction for the overall network. 
+
+Number of hidden units – Roughly corresponds  to the amount of features that may be processed in each layer.
+
+(Mini) Batch size – The number of samples selected from the trading set to evaluate the gradient decent at any given time. 
+
+Weight initialization method procedure (WIMP) – Strategy for introducing the initial weights. 
+
+CD Epochs – The maximum number of iteration during Boltzmann optimization.
+
+CD Learn Rate – Learning right for the Boltzmann optimization. 
+
+Convolution networks  - Whether to use or not to use a convolutional network (using one introduces a whole new set of hyper-parameters). 
+
+Cost Function – Which type of cost function to use, such as: logistic, linear, etc. 
+
+Layer by layer fitness function evaluation – Whether to use it .  
+
+Activation Function – Such as: sigmoid, arc tan, etc.
+
+Pre Processing Strategy – whether to use raw data or to pre process it using: PCA, Fourier Transform, et al. 
+
+\section{Genetic algorithm and multi-objective optimization}
+
+\section{Methods}
+
+\section{Results}
+
+\section{Future work}
+
+\section{Reading}
+\nocite{*}
+\bibliographystyle{amsplain}
+\bibliography{cifarten}
+
+\end{document}
