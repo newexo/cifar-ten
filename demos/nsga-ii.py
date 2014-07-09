@@ -48,11 +48,11 @@ def crowding_distance(population):
 		crowding_distances[chromisome] = 0
 	for i in range(num_objectives):
 		ordered_by_objective = sorted(population, key = lambda x:population[x][i])
-		crowding_distances[ordered_by_objective[0]] += float("inf") # would num_objectives be better?
-		crowding_distances[ordered_by_objective[l - 1]] += float("inf")
+		crowding_distances[ordered_by_objective[0]] -= float("inf") # would num_objectives be better?
+		crowding_distances[ordered_by_objective[l - 1]] -= float("inf")
 		for j in range(1, l - 1):
-			crowding_distance = (population[ordered_by_objective[j + 1]][i] - population[ordered_by_objective[j - 1]][i])/(population[ordered_by_objective[l-1]][i] - population[ordered_by_objective[0]][i])
-			crowding_distances[ordered_by_objective[j]] += crowding_distance
+			crowding_distance = (float(population[ordered_by_objective[j + 1]][i]) - float(population[ordered_by_objective[j - 1]][i]))/(float(population[ordered_by_objective[l-1]][i]) - float(population[ordered_by_objective[0]][i]))
+			crowding_distances[ordered_by_objective[j]] -= crowding_distance
 	return crowding_distances
 	
 
@@ -71,9 +71,9 @@ def new_population(parents, children):
 				spaces_remaining -= 1
 			front += 1
 		else:
-			front_dict = dict((key, combined_population[key]) for key in fronts[front])
-			crowding_distances = crowding_distance(front_dict)
-			sorted_by_crowding = sorted(crowding_distances, key = lambda x:crowding_distances[x])
+			crowding_distances = crowding_distance(combined_population)
+			front_with_crowding = dict((key, crowding_distances[key]) for key in fronts[front])
+			sorted_by_crowding = sorted(front_with_crowding, key = lambda x:front_with_crowding[x])
 			for i in range(spaces_remaining):
 				new_pop[sorted_by_crowding[i]] = combined_population[sorted_by_crowding[i]]
 			spaces_remaining = 0
