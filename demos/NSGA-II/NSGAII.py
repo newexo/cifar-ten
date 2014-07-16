@@ -1,3 +1,4 @@
+import mutations
 import random
 from ObjectiveFunction import get_objectives
 
@@ -79,29 +80,39 @@ def new_population(parents_hyperparameters, parents_objectives, children_hyperpa
 	combined_population_objectives = dict(parents_objectives.items() + children_objectives.items())
 	fns = fast_nondominated_sort(combined_population_objectives)
 	fronts = fns[1]
-	new_pop_hyperparameters = {}
-	new_pop_objectives = {}
-	spaces_remaining = len(parents_hyperparameters)
-	front = 0
-	while spaces_remaining > 0:
-		if spaces_remaining >= len(fronts[front]):
-			for chromosome in fronts[front]:
-				new_pop_objectives[chromosome] = combined_population_objectives[chromosome]
-				new_pop_hyperparameters[chromosome] = combined_population_hyperparameters[chromosome]
-				spaces_remaining -= 1
-			front += 1
-		else:
-			crowding_distances = crowding_distance(combined_population_objectives)
-			front_with_crowding = dict((key, crowding_distances[key]) for key in fronts[front])
-			sorted_by_crowding = sorted(front_with_crowding, key = lambda x:front_with_crowding[x])
-			for i in range(spaces_remaining):
-				new_pop_objectives[sorted_by_crowding[i]] = combined_population_objectives[sorted_by_crowding[i]]
-				new_pop_hyperparameters[sorted_by_crowding[i]] = combined_population_hyperparameters[sorted_by_crowding[i]]
-			spaces_remaining = 0
-	return [new_pop_hyperparameters, new_pop_objectives]	
-	
+# 	for i in range(len(fronts)):
+# 		output = []
+# 		for j in range(len(fronts[i])):
+# 			output.append(combined_population_hyperparameters[fronts[i][j]])
+# 		print "front %s" % i 
+# 		print output
+	if len(fronts) == 1:
+		return "stop"
+	else:
+		new_pop_hyperparameters = {}
+		new_pop_objectives = {}
+		spaces_remaining = len(parents_hyperparameters)
+		front = 0
+		while spaces_remaining > 0:
+			if spaces_remaining >= len(fronts[front]):
+				for chromosome in fronts[front]:
+					new_pop_objectives[chromosome] = combined_population_objectives[chromosome]
+					new_pop_hyperparameters[chromosome] = combined_population_hyperparameters[chromosome]
+					spaces_remaining -= 1
+				front += 1
+			else:
+				crowding_distances = crowding_distance(combined_population_objectives)
+				front_with_crowding = dict((key, crowding_distances[key]) for key in fronts[front])
+				sorted_by_crowding = sorted(front_with_crowding, key = lambda x:front_with_crowding[x])
+				for i in range(spaces_remaining):
+					new_pop_objectives[sorted_by_crowding[i]] = combined_population_objectives[sorted_by_crowding[i]]
+					new_pop_hyperparameters[sorted_by_crowding[i]] = combined_population_hyperparameters[sorted_by_crowding[i]]
+				spaces_remaining = 0
+		return [new_pop_hyperparameters, new_pop_objectives]	
+		
 	
 def crossover(chromosome0, chromosome1):
+	#creates two children that are a mix of their parents
 	new_chromosome0 = [0] * len(chromosome0)
 	new_chromosome1 = [0] * len(chromosome0)
 	for i in range(len(chromosome0)):
@@ -114,8 +125,9 @@ def crossover(chromosome0, chromosome1):
 	return[new_chromosome0, new_chromosome1]
 	
 	
+	
 def make_children(parents_hyperparementers, parents_objectives, generation):
-	#creates a generation of offspring using the genetic algorithm with rank as the sole fitness function
+	#creates a generation of offspring using the genetic algorithm 
 	
 	children_hyperparameters = {}
 	children_objectives = {}
@@ -126,6 +138,7 @@ def make_children(parents_hyperparementers, parents_objectives, generation):
 		chromosome2 = random.choice(list_of_chromosomes)
 		list_of_chromosomes.remove(chromosome2)
 		children = crossover(parents_hyperparementers[chromosome1], parents_hyperparementers[chromosome2])
+		#should add mutation here
 		new_key1 = chromosome1 + "-%s" % (generation + 1)
 		new_key2 = chromosome2 + "-%s" % (generation + 1)
 		children_hyperparameters[new_key1] = children[0]
@@ -142,13 +155,16 @@ def nsgaii(initial_population_hyperparameters):
 	for chromosome in population_hyperparameters:
 		population_objectives[chromosome] = get_objectives(population_hyperparameters[chromosome])
 	population = [population_hyperparameters, population_objectives]
-	num_generations = 10
+	num_generations = 100
 	generation = 0
-	while generation < num_generations: #stopping condition?
+	while generation < num_generations: 
 		children = make_children(population_hyperparameters, population_objectives, generation)
 		population = new_population(population_hyperparameters, population_objectives, children[0], children[1])
-		population_hyperparameters = population[0]
-		population_objectives = population[1]
-		generation += 1
+		if population == "stop":
+			break
+		else:
+			population_hyperparameters = population[0]
+			population_objectives = population[1]
+			generation += 1
 	return population_hyperparameters.values()
 	

@@ -3,4 +3,4 @@ def get_objectives(hyperparameters):
 	
 	x = hyperparameters[0]
 	y = hyperparameters[1]
-	return [x * y - 3 * (x^2) , x + 2 * y]
+	return [(x + y - 10) ** 2, (x + y - 20) ** 2]
