@@ -43,8 +43,8 @@ def test_DBN(dataset, hyper):
     for i in xrange(dbn.n_layers):
         layerObjectives = []
         for epoch in xrange(hyper.pretrainingEpochs):
-            t = (epoch, (time.time() - start_time) / 60.0
-            print 'Pretraining epoch %d, time %.2f' % t)
+            t = (epoch, (time.time() - start_time) / 60.0)
+            print 'Pretraining epoch %d, time %.2f' % (t)
             c = []
             for batch_index in xrange(n_train_batches):
                 c.append(pretraining_fns[i](index=batch_index,
@@ -134,4 +134,4 @@ def interpretObjectives(objectives):
     print "Finetuning time %f, best validation loss %f and test score %f." % (finetuning, best_validation_loss, test_score)
 
 if __name__ == '__main__':
-    transformed()
+    test_DBN(CifarData(Cifar10PartRaw(), numberEpochs = 2, pretrainingEpochs = 1))
