@@ -49,5 +49,10 @@ def hyper():
         nHidden=nHidden)
     
 if __name__ == '__main__':
-    DBNClassifier.test_DBN(dataset.Mnist(), hyper())
-
+    d = dataset.Mnist()
+    for i in range(1, 25):
+        print "Experiment %d" % i
+        logs = DBNClassifier.test_DBN(d, hyper())
+        print logs
+        print DBNClassifier.interpretObjectives(logs)
+        print ""

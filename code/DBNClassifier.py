@@ -43,8 +43,8 @@ def test_DBN(dataset, hyper):
     for i in xrange(dbn.n_layers):
         layerObjectives = []
         for epoch in xrange(hyper.pretrainingEpochs):
-            t = (epoch, (time.time() - start_time) / 60.0)
-            print 'Pretraining epoch %d, time %.2f' % (t)
+            t = (time.time() - start_time) / 60.0
+            print 'Pretraining epoch %d, time %.2f' % (epoch, t)
             c = []
             for batch_index in xrange(n_train_batches):
                 c.append(pretraining_fns[i](index=batch_index,
@@ -128,10 +128,20 @@ def test_DBN(dataset, hyper):
 
 def interpretObjectives(objectives):
     pretrainObjectives, finetuningObjectives = objectives
-    pretrainingTime, cost = pretrainObjectives[len(pretrainObjectives) - 1]
-    print "Pretraining time %f and cost %f" % (pretraining, cost)
-    finetuningTime, best_validation_loss, test_score = finetuningObjectives(len(finetuningObjectives))
-    print "Finetuning time %f, best validation loss %f and test score %f." % (finetuning, best_validation_loss, test_score)
+    lastPretrainedLayer = pretrainObjectives[len(pretrainObjectives) - 1]
+    pretrainingTime, cost = lastPretrainedLayer[len(lastPretrainedLayer) - 1]
+    postpretrainerror = finetuningObjectives[0][1]
+    print "Pretraining time %f and error %f" % (pretrainingTime, postpretrainerror)
+    finetuningTime, best_validation_loss, test_score = finetuningObjectives[len(finetuningObjectives) - 1]
+    print "Finetuning time %f, best validation loss %f and test score %f." % (finetuningTime, best_validation_loss, test_score)
+    return pretrainingTime, postpretrainerror, finetuningTime, test_score
 
 if __name__ == '__main__':
-    test_DBN(CifarData(Cifar10PartRaw(), numberEpochs = 2, pretrainingEpochs = 1))
+    hyper = HyperparametersDBN(learningRate=0.1,
+                               numberEpochs=4,
+                               pretrainingEpochs=1,
+                               pretrainingLearningRate=0.1,
+                               nHidden=[3000, 3000, 3000])
+    logs = test_DBN(Mnist(), hyper)
+    print logs
+    print interpretObjectives(logs)
