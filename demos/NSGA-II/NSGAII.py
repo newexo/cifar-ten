@@ -80,12 +80,6 @@ def new_population(parents_hyperparameters, parents_objectives, children_hyperpa
 	combined_population_objectives = dict(parents_objectives.items() + children_objectives.items())
 	fns = fast_nondominated_sort(combined_population_objectives)
 	fronts = fns[1]
-# 	for i in range(len(fronts)):
-# 		output = []
-# 		for j in range(len(fronts[i])):
-# 			output.append(combined_population_hyperparameters[fronts[i][j]])
-# 		print "front %s" % i 
-# 		print output
 	if len(fronts) == 1:
 		return "stop"
 	else:
