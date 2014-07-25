@@ -39,15 +39,21 @@ def test_DBN(dataset, hyper):
     print '... pre-training the model'
     start_time = time.time()
 
+    pretrainObjectives = []
     for i in xrange(dbn.n_layers):
+        layerObjectives = []
         for epoch in xrange(hyper.pretrainingEpochs):
-            print 'Pretraining epoch %d, time %.2f' % (epoch, (time.time() - start_time) / 60.0)
+            t = (time.time() - start_time) / 60.0
+            print 'Pretraining epoch %d, time %.2f' % (epoch, t)
             c = []
             for batch_index in xrange(n_train_batches):
                 c.append(pretraining_fns[i](index=batch_index,
                                             lr=hyper.pretrainingLearningRate))
+            cost = abs(numpy.mean(c))
             print 'Pre-training layer %i, epoch %d, cost ' % (i, epoch),
-            print numpy.mean(c)
+            print cost
+            layerObjectives.append((t, cost))
+        pretrainObjectives.append(layerObjectives)
 
     end_time = time.time()
     print 'The pretraining code for file ' + os.path.split(__file__)[1] + ' ran for %.2fm' % ((end_time - start_time) / 60.0)
@@ -57,7 +63,7 @@ def test_DBN(dataset, hyper):
                 datasets=datasets, batch_size=hyper.batchSize,
                 learning_rate=hyper.learningRate)
 
-    print '... finetunning the model'
+    print '... finetuning the model'
     # early-stopping parameters
     patience = 4 * n_train_batches  # look as this many examples regardless
     validation_frequency = min(n_train_batches, patience / 2)
@@ -70,9 +76,11 @@ def test_DBN(dataset, hyper):
     done_looping = False
     epoch = 0
 
+    finetuningObjectives = []
     while (epoch < hyper.numberEpochs) and (not done_looping):
         epoch = epoch + 1
-	print 'Finetuning epoch %d, time %.2f' % (epoch, (time.time() - start_time) / 60.0)
+        t = (time.time() - start_time) / 60.0
+        print 'Finetuning epoch %d, time %.2f' % (epoch, t)
         for minibatch_index in xrange(n_train_batches):
 
             minibatch_avg_cost = train_fn(minibatch_index)
@@ -105,7 +113,7 @@ def test_DBN(dataset, hyper):
             if patience <= iter:
                 done_looping = True
                 break
-
+        finetuningObjectives.append((t, best_validation_loss, test_score))    
     end_time = time.time()
     print(('Optimization complete with best validation score of %.2f %%,'
            'with test performance %.2f %%') %
@@ -115,56 +123,25 @@ def test_DBN(dataset, hyper):
                           ' ran for %.2fm' % ((end_time - start_time)
                                               / 60.))
 
-def transformed():
-    from transform import datasetEightByEight
-    raw = Cifar10PartRaw()
-    datasetEightByEight(raw)
-    data = CifarData(raw)
+    return pretrainObjectives, finetuningObjectives
 
-    print 'test 1'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 10, pretrainingEpochs = 10, nHidden=[200, 200]))
 
-    print 'test 2'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 100, nHidden=[200, 200]))
-
-    print 'test 3'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 500, nHidden=[200, 200]))
-
-    print 'test 4'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 10, pretrainingEpochs = 10, nHidden=[500, 500]))
-
-    print 'test 5'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 100, nHidden=[500, 500]))
-
-    print 'test 6'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 500, nHidden=[500, 500]))
-
-    print 'test 7'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 10, pretrainingEpochs = 10, nHidden=[1000, 1000]))
-
-    print 'test 8'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 100, nHidden=[1000, 1000]))
-
-    print 'test 9'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 500, nHidden=[1000, 1000]))
-
-    print 'test 10'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 10, pretrainingEpochs = 10, nHidden=[100, 50]))
-
-    print 'test 11'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 100, nHidden=[100, 50]))
-
-    print 'test 12'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 500, nHidden=[100, 500]))
-
-    print 'test 13'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 10, pretrainingEpochs = 10, nHidden=[300, 100, 50]))
-
-    print 'test 14'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 100, nHidden=[300, 100, 50]))
-
-    print 'test 15'    
-    test_DBN(data, HyperparametersDBN(numberEpochs = 100, pretrainingEpochs = 500, nHidden=[300, 100, 500]))
+def interpretObjectives(objectives):
+    pretrainObjectives, finetuningObjectives = objectives
+    lastPretrainedLayer = pretrainObjectives[len(pretrainObjectives) - 1]
+    pretrainingTime, cost = lastPretrainedLayer[len(lastPretrainedLayer) - 1]
+    postpretrainerror = finetuningObjectives[0][1]
+    print "Pretraining time %f and error %f" % (pretrainingTime, postpretrainerror)
+    finetuningTime, best_validation_loss, test_score = finetuningObjectives[len(finetuningObjectives) - 1]
+    print "Finetuning time %f, best validation loss %f and test score %f." % (finetuningTime, best_validation_loss, test_score)
+    return pretrainingTime, postpretrainerror, finetuningTime, test_score
 
 if __name__ == '__main__':
-    transformed()
+    hyper = HyperparametersDBN(learningRate=0.1,
+                               numberEpochs=4,
+                               pretrainingEpochs=1,
+                               pretrainingLearningRate=0.1,
+                               nHidden=[3000, 3000, 3000])
+    logs = test_DBN(Mnist(), hyper)
+    print logs
+    print interpretObjectives(logs)
