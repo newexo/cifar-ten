@@ -1,15 +1,14 @@
 import mutations
 import random
-from ObjectiveFunction import get_objectives
 
 def domination_count_and_set(population, element):
-	#gives the domination count and dominating set of the element of the population
+	# gives the domination count and dominating set of the element of the population
 	
 	domination_count = 0
 	dominated_set = [] 
 	for chromosome in population:
-		dominated_sum = 0 #will equal number of objectives if chromosome is dominated by element
-		dominating_sum = 0 #will equal number of objectives if element is dominated by chromosome
+		dominated_sum = 0 # will equal number of objectives if chromosome is dominated by element
+		dominating_sum = 0 # will equal number of objectives if element is dominated by chromosome
 		for i in range(len(population[element])):
 			if population[element][i] < population[chromosome][i]:
 				dominated_sum += 1
@@ -23,11 +22,10 @@ def domination_count_and_set(population, element):
 		if dominating_sum == len(population[element]) and population[element] != population[chromosome]:
 			domination_count += 1
 	return [domination_count, dominated_set]
-#what should we do if two chromosomes have the exact some objectives? here neither dominates the other	
+# what should we do if two chromosomes have the exact some objectives? here neither dominates the other	
 
-	
 def fast_nondominated_sort(population):
-	#gives the list of the domination fronts, in order, and a dictionary with the ranks of the chromosomes
+	# gives the list of the domination fronts, in order, and a dictionary with the ranks of the chromosomes
 
 	domination_dict = {}
 	for chromosome in population:
@@ -52,7 +50,7 @@ def fast_nondominated_sort(population):
 	return [rank_list, domination_fronts[:len(domination_fronts) - 1]]
 	
 def crowding_distance(population):
-#gives a dictionary in which the value of each chromisome is its  crowding distance
+# gives a dictionary in which the value of each chromosome is its crowding distance
 
 	l = len(population)
 	num_objectives = len(population.values()[0])
@@ -72,9 +70,8 @@ def crowding_distance(population):
 				crowding_distances[ordered_by_objective[j]] -= crowding_distance
 	return crowding_distances
 	
-
 def new_population(parents_hyperparameters, parents_objectives, children_hyperparameters, children_objectives):
-	#combines the two new populations and then selects the best chromisomes with respect to the crowded comparison order
+	# combines the two new populations and then selects the best chromosome with respect to the crowded comparison order
 	
 	combined_population_hyperparameters = dict(parents_hyperparameters.items() + children_hyperparameters.items())
 	combined_population_objectives = dict(parents_objectives.items() + children_objectives.items())
@@ -104,9 +101,8 @@ def new_population(parents_hyperparameters, parents_objectives, children_hyperpa
 				spaces_remaining = 0
 		return [new_pop_hyperparameters, new_pop_objectives]	
 		
-	
 def crossover(chromosome0, chromosome1):
-	#creates two children that are a mix of their parents
+	# creates two children that are a mix of their parents
 	new_chromosome0 = [0] * len(chromosome0)
 	new_chromosome1 = [0] * len(chromosome0)
 	for i in range(len(chromosome0)):
@@ -118,10 +114,8 @@ def crossover(chromosome0, chromosome1):
 			new_chromosome1[i] = chromosome1[i]
 	return[new_chromosome0, new_chromosome1]
 	
-	
-	
-def make_children(parents_hyperparementers, parents_objectives, generation):
-	#creates a generation of offspring using the genetic algorithm 
+def make_children(get_objectives, mutate, parents_hyperparementers, parents_objectives, generation):
+	# creates a generation of offspring using the genetic algorithm 
 	
 	children_hyperparameters = {}
 	children_objectives = {}
@@ -132,7 +126,7 @@ def make_children(parents_hyperparementers, parents_objectives, generation):
 		chromosome2 = random.choice(list_of_chromosomes)
 		list_of_chromosomes.remove(chromosome2)
 		children = crossover(parents_hyperparementers[chromosome1], parents_hyperparementers[chromosome2])
-		#should add mutation here
+		# should add mutation here
 		new_key1 = chromosome1 + "-%s" % (generation + 1)
 		new_key2 = chromosome2 + "-%s" % (generation + 1)
 		children_hyperparameters[new_key1] = children[0]
@@ -141,8 +135,8 @@ def make_children(parents_hyperparementers, parents_objectives, generation):
 		children_objectives[new_key2] = get_objectives(children_hyperparameters[new_key2])
 	return [children_hyperparameters, children_objectives]
 	
-def nsgaii(initial_population_hyperparameters):
-	#implement NSGA-II
+def nsgaii(get_objectives, mutate, initial_population_hyperparameters):
+	# implement NSGA-II
 	
 	population_hyperparameters = initial_population_hyperparameters
 	population_objectives = {}
@@ -152,7 +146,7 @@ def nsgaii(initial_population_hyperparameters):
 	num_generations = 100
 	generation = 0
 	while generation < num_generations: 
-		children = make_children(population_hyperparameters, population_objectives, generation)
+		children = make_children(get_objectives, population_hyperparameters, population_objectives, generation)
 		population = new_population(population_hyperparameters, population_objectives, children[0], children[1])
 		if population == "stop":
 			break

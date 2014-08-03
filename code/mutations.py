@@ -10,6 +10,3 @@ def mutate(chromosome):
 			new_chromosome.append(chromosome(i))
 	return new_chromososome
 
-
-
-

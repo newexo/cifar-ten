@@ -10,6 +10,7 @@ import testDirectories
 import testIris
 import testPreprocess
 import testCifar10Datasets
+import testNsga2
 
 class TestCifarTen(unittest.TestCase, 
     testExample.TestSequenceFunctions,
@@ -17,7 +18,8 @@ class TestCifarTen(unittest.TestCase,
     testDirectories.TestDirectories,
     testIris.TestIris,
     testPreprocess.TestPreprocess,
-    testCifar10Datasets.TestCifar10Datasets):
+    testCifar10Datasets.TestCifar10Datasets,
+    testNsga2.TestNSGA2):
 
     def setUp(self):
         testExample.TestSequenceFunctions.setUp(self)
@@ -26,6 +28,7 @@ class TestCifarTen(unittest.TestCase,
         testIris.TestIris.setUp(self)
         testPreprocess.TestPreprocess.setUp(self)
         testCifar10Datasets.TestCifar10Datasets.setUp(self)
+        testNsga2.TestNSGA2.setUp(self)
 
     def testTest(self):
         self.assertEqual(2 + 2, 4)
