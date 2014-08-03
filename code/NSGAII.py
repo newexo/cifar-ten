@@ -1,4 +1,3 @@
-import mutations
 import random
 
 def domination_count_and_set(population, element):
