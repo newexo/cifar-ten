@@ -98,3 +98,9 @@ class ChromosomeMnist(object):
 			child1.genes[i] = self.genes[i]
         return child0, child1
 
+def getRandomChromosomeMnist():
+    genes = [0] * 7
+    for i in range(7):
+        genes[i] = random.random()
+    return ChromosomeMnist(genes)
+    

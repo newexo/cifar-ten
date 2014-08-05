@@ -113,7 +113,7 @@ def crossover(chromosome0, chromosome1):
 			new_chromosome1[i] = chromosome1[i]
 	return[new_chromosome0, new_chromosome1]
 	
-def make_children(get_objectives, mutate, parents_hyperparementers, parents_objectives, generation):
+def make_children(get_objectives, parents_hyperparementers, parents_objectives, generation):
 	# creates a generation of offspring using the genetic algorithm 
 	
 	children_hyperparameters = {}

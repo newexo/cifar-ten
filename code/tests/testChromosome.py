@@ -43,16 +43,12 @@ class TestChromosome():
     def testMutate(self):
         chrome = chromosome.ChromosomeMnist([0.9, 0.4, 0.5, 0.5, 0.9, 0.8, 0.3])
         chrome.mutate()
-        print chrome.genes
         # just testing that the function does not crash anything
         
     def testCrossover(self):
         parent0 = chromosome.ChromosomeMnist([0, 1, 2])
         parent1 = chromosome.ChromosomeMnist([3, 4, 5])
         child0, child1 = parent0.crossover(parent1)
-        print "Children with three genes"
-        print child0.genes
-        print child1.genes
         
         # Chromosomes together should still contain all of the original genes.
         allgenes = child0.genes + child1.genes
@@ -64,13 +60,9 @@ class TestChromosome():
         zeros = chromosome.ChromosomeMnist([0] * 32)
         ones = chromosome.ChromosomeMnist([1] * 32)
         child2, child3 = zeros.crossover(ones)
-        print "Children with 32 genes"
-        print child2.genes
-        print child3.genes
         self.assertNotEqual(child2.genes, [0] * 32)
 
     def testHyperparameters(self):
-        self.chrome.display()
         hyper = self.chrome.hyper()
         self.assertEqual(hyper.learningRate, self.chrome.learningRate())
         self.assertEqual(hyper.numberEpochs, self.chrome.numberEpochs())
