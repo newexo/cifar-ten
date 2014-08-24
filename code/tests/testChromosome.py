@@ -8,6 +8,9 @@ class ChromosomeTestImplementation(chromosome.Chromosome):
     def numberOfGenes(self):
         return 32
 
+    def copy(self):
+        return ChromosomeTestImplementation(self.genes)
+
 class TestChromosome():
 
     def setUp(self):

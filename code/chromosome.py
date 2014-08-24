@@ -1,6 +1,7 @@
 import random
 import hyperparameter
 import DBNClassifier
+import dataset
 
 class Chromosome(object):
     def __init__(self, genes = []):
@@ -8,9 +9,6 @@ class Chromosome(object):
             self.genes = list(genes)
         else:
             self.genes = [random.random() for i in range(self.numberOfGenes())]
-
-    def copy(self):
-        return ChromosomeMnist(self.genes)
 
     def mutationRate(self):
         return self.genes[0]
@@ -114,4 +112,8 @@ class ChromosomeMnist(Chromosome):
         print "Improvement threshold = %f" % self.improvementThreshold()
         print "k = %d" % self.k()
         print "Size of hidden layers = ", self.nHidden()
+
+def initialMnistPopulation(size = 100):
+    data = dataset.Mnist()
+    return [ChromosomeMnist(data) for i in range(size)]
     
