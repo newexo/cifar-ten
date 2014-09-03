@@ -4,6 +4,7 @@ from sklearn.externals import joblib
 from nolearn.dbn import DBN
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
 from datasets import *
 
 datasets = dataset.sharedTrain, dataset.sharedValid, dataset.sharedTest
@@ -32,3 +33,4 @@ predicted = net.predict(test_set_x)
 print "Classification report for classifier %s:\n%s\n" % (
     net, classification_report(expected, predicted))
 print "Confusion matrix:\n%s" % confusion_matrix(expected, predicted)
+print "Accuracy score:",accuracy_score(expected,predicted)
