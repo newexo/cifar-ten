@@ -1,15 +1,15 @@
-import cPickle
+#import cPickle
 import numpy as np
-from sklearn.externals import joblib
+#from sklearn.externals import joblib
 from nolearn.dbn import DBN
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
-from datasets import *
+from dataset import *
 
 datasets = dataset.sharedTrain, dataset.sharedValid, dataset.sharedTest
 train_set_x, train_set_y = dataset.sharedTrain
-valid_set_x, valid_set_y = dataset.sharedValid
+#valid_set_x, valid_set_y = dataset.sharedValid
 test_set_x, test_set_y = dataset.sharedTest
 
 
