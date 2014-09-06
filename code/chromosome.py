@@ -42,7 +42,7 @@ class ChromosomeMnist(Chromosome):
         return 0.001 * (10 ** (gene * 3.0))
 
     def computeEpochs(self, gene):
-        return max(int(50 * gene), 1)
+        return max(int(20 * gene), 1)
         
     def computeLayersize(self, gene):
         return 100 + int(5000 * gene)

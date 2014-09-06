@@ -1,4 +1,5 @@
 import random
+import sys
 
 def domination_count_and_set(population, element):
 	# gives the domination count and dominating set of the element of the population
@@ -124,13 +125,18 @@ def get_objectives(population):
 	return objectives 
 
 def nsgaii(initial_population, num_generations = 100):
-    def poppair(i):
-        key = i, 0
-        return key, initial_population[i]
+   def poppair(i):
+      key = i, 0
+      return key, initial_population[i]
 
-    population = dict([poppair(i) for i in range(len(initial_population))])
-    objectives = get_objectives(population)
-    for generation in range(num_generations): 
-        population, objectives = new_population(population, objectives, make_children(population, generation))
-    return population.values()
-	
+   population = dict([poppair(i) for i in range(len(initial_population))])
+   objectives = get_objectives(population)
+   for generation in range(num_generations): 
+      population, objectives = new_population(population, objectives, make_children(population, generation))
+      print "Generation %d" % generation
+      print population
+      print objectives
+      sys.stdout.flush()
+            
+   return population.values()
+
