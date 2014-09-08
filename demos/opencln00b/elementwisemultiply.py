@@ -4,30 +4,32 @@
 
 import numpy as np
 import pyopencl as cl
+import pyopencl.array
+from pyopencl.elementwise import ElementwiseKernel
 
-a_np = np.random.rand(50000).astype(np.float32)
-b_np = np.random.rand(50000).astype(np.float32)
+n = 10
+a_np = np.random.randn(n).astype(np.float32)
+b_np = np.random.randn(n).astype(np.float32)
 
 ctx = cl.create_some_context()
 queue = cl.CommandQueue(ctx)
 
-mf = cl.mem_flags
-a_g = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=a_np)
-b_g = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=b_np)
+a_g = cl.array.to_device(queue, a_np)
+b_g = cl.array.to_device(queue, b_np)
 
-prg = cl.Program(ctx, """
-__kernel void sum(__global const float *a_g, __global const float *b_g, __global float *res_g) {
-  int gid = get_global_id(0);
-  res_g[gid] = a_g[gid] + b_g[gid];
-}
-""").build()
+lin_mult = ElementwiseKernel(ctx,
+    "float k1, float *a_g, float k2, float *b_g, float *res_g",
+    "res_g[i] = k1 * a_g[i] * k2 * b_g[i]",
+    "lin_mult"
+)
 
-res_g = cl.Buffer(ctx, mf.WRITE_ONLY, a_np.nbytes)
-prg.sum(queue, a_np.shape, None, a_g, b_g, res_g)
+res_g = cl.array.empty_like(a_g)
+lin_mult(2, a_g, 3, b_g, res_g)
 
-res_np = np.empty_like(a_np)
-cl.enqueue_copy(queue, res_np, res_g)
+# Check on GPU with PyOpenCL Array:
+print((res_g - (2 * a_g + 3 * b_g)).get())
 
 # Check on CPU with Numpy:
-print(res_np - (a_np + b_np))
-print(np.linalg.norm(res_np - (a_np + b_np)))
+res_np = res_g.get()
+print(res_np - (2 * a_np + 3 * b_np))
+print(np.linalg.norm(res_np - (2 * a_np + 3 * b_np)))
