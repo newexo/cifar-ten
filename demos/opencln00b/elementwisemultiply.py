@@ -22,7 +22,7 @@ queue = cl.CommandQueue(ctx)
 a_g = cl.array.to_device(queue, a_np)
 b_g = cl.array.to_device(queue, b_np)
 
-# pass in ElementwiseKernel(context, arguments, operation, name="kernel")
+# Use ElementwiseKernel(context, arguments, operation, name="kernel")
 lin_mult = ElementwiseKernel(ctx,
     "float *a_g, float *b_g, float *res_g",
     "res_g[i] = a_g[i] * b_g[i]",
