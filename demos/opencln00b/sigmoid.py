@@ -4,6 +4,7 @@
 
 import numpy as np
 import pyopencl as cl
+import scipy as sci
 
 a = np.random.rand(50000).astype(np.float32)
 b = np.random.rand(50000).astype(np.float32)
@@ -28,24 +29,19 @@ target = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=b)
 # a_g=mat, b_g=target, res_g=len)
 
 prg = cl.Program(ctx, """
-__kernel void ApplySigmoid(__global const float *mat, __global const float *target, int len) {
-#	int idx = wkgrpIdx.x * wkgrpDim.x + gidIdx.x;
-#   int numWkItm = wkgrpDim.x * gidDim.x;
-
-#   for (unsigned int i = idx; i < len; i += numThreads) {
-  
-  int gid = get_global_id(0);
+__kernel void ApplySigmoid(__global const float *mat, __global float *target) {
+	int gid = get_global_id(0);
 		target[gid] = 1 / (1 + exp(-mat[gid]));
 }
 """).build()
 
 target = cl.Buffer(ctx, mf.WRITE_ONLY, a.nbytes)
-prg.ApplySigmoid(queue, a.shape, None, mat, target, len)
+prg.ApplySigmoid(queue, a.shape, None, mat, target)
 
-res_np = np.empty_like(a)
-cl.enqueue_copy(queue, res_np, len)
+target = np.empty_like(a)
+#cl.enqueue_copy(queue, target, None)
 
 # Check on CPU with Numpy:
 # target[i] = 1 / (1 + __expf(-mat[i]))
-print(res_np - (a + b))
-print(np.linalg.norm(res_np - (a + b)))
+print(target)
+print(1 / (1 + np.exp(-a)))
