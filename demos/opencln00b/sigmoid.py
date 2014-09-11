@@ -1,47 +1,38 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # gus
 
+# import PyOpenCL and Numpy. An OpenCL-enabled GPU is not required,
 import numpy as np
 import pyopencl as cl
-import scipy as sci
 
+# initialize operating variables
 a = np.random.rand(50000).astype(np.float32)
 b = np.random.rand(50000).astype(np.float32)
 
+# create an OpenCL context
 ctx = cl.create_some_context()
 queue = cl.CommandQueue(ctx)
 
+# create context buffers for a and b arrays
 mf = cl.mem_flags
-mat = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=a)
-target = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=b)
-#a = pycl_array.to_device(queue, np.random.rand(50000).astype(np.float32))
+matrix = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=a)
+target = cl.Buffer(ctx, mf.WRITE_ONLY, b.nbytes)
 
-
-#__global__ void kApplySigmoid(float* mat, float* target, unsigned int len) {
-#    const unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
-#    const unsigned int numThreads = blockDim.x * gridDim.x;
-#
-#    for (unsigned int i = idx; i < len; i += numThreads) {
-#        target[i] = 1 / (1 + __expf(-mat[i]));
-#   }
-#}
-# a_g=mat, b_g=target, res_g=len)
-
+# OpenCL (C99) kernel code, compiled
 prg = cl.Program(ctx, """
-__kernel void ApplySigmoid(__global const float *mat, __global float *target) {
+__kernel void ApplySigmoid(__global const float *matrix, __global float *target) {
 	int gid = get_global_id(0);
-		target[gid] = 1 / (1 + exp(-mat[gid]));
+	target[gid] = 1 / (1 + exp(-matrix[gid]));
 }
 """).build()
 
-target = cl.Buffer(ctx, mf.WRITE_ONLY, a.nbytes)
-prg.ApplySigmoid(queue, a.shape, None, mat, target)
+# launch the kernel
+event = prg.ApplySigmoid(queue, a.shape, None, matrix, target)
 
-target = np.empty_like(a)
-#cl.enqueue_copy(queue, target, None)
+# copy the output from the context to the Python process
+cl.enqueue_copy(queue, b, target)
 
-# Check on CPU with Numpy:
-# target[i] = 1 / (1 + __expf(-mat[i]))
-print(target)
+# check on CPU with Numpy:
+print(b)
 print(1 / (1 + np.exp(-a)))
