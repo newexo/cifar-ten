@@ -8,8 +8,8 @@ import pyopencl as cl
 import pyopencl.clmath as clm
 
 # initialize operating variables
-a = np.random.rand(50000).astype(np.float16)
-b = np.random.rand(50000).astype(np.float16)
+a = np.random.rand(50000).astype(np.float32)
+b = np.random.rand(50000).astype(np.float32)
 
 # create an OpenCL context
 ctx = cl.create_some_context()
@@ -24,7 +24,7 @@ target = cl.Buffer(ctx, mf.WRITE_ONLY, b.nbytes)
 prg = cl.Program(ctx, """
 __kernel void ApplyTanh(__global const float *matrix, __global float *target) {
 	int gid = get_global_id(0);
-	target[gid] = tanh(matrix);
+	target[gid] = tanh(matrix[gid]);
 }
 """).build()
 
@@ -36,4 +36,4 @@ cl.enqueue_copy(queue, b, target)
 
 # check on CPU with Numpy:
 print(b)
-print(tanh(a))
+print(np.tanh(a))
