@@ -27,9 +27,9 @@ class TestChromosome():
     def testEpochs(self):
         self.assertEqual(1, self.chrome.computeEpochs(0))
         # there is a 10% chance of zero epochs
-        self.assertEqual(5, self.chrome.computeEpochs(0.1))
-        self.assertEqual(25, self.chrome.computeEpochs(0.5))
-        self.assertEqual(50, self.chrome.computeEpochs(1))
+        self.assertEqual(2, self.chrome.computeEpochs(0.1))
+        self.assertEqual(10, self.chrome.computeEpochs(0.5))
+        self.assertEqual(20, self.chrome.computeEpochs(1))
 
     def testLayersize(self):
         self.assertEqual(100, self.chrome.computeLayersize(0))

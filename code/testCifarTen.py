@@ -30,6 +30,10 @@ class TestCifarTen(unittest.TestCase,
         testNsga2.TestNSGA2.setUp(self)
         testChromosome.TestChromosome.setUp(self)
 
+    def tearDown(self):
+        testNsga2.TestNSGA2.tearDown(self)
+              
+
     def testTest(self):
         self.assertEqual(2 + 2, 4)
             
