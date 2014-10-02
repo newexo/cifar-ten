@@ -124,7 +124,16 @@ def get_objectives(population):
 		objectives[chromosome] = population[chromosome].getObjectives()   
 	return objectives 
 
-def nsgaii(initial_population, num_generations = 100):
+def log_stdout(generation, population, objectives):
+    print "Generation %d" % generation
+    print population
+    print objectives
+    sys.stdout.flush()
+
+def log_discard(generation, population, objectives):
+    pass
+
+def nsgaii(initial_population, num_generations = 100, log_out = log_discard):
    def poppair(i):
       key = i, 0
       return key, initial_population[i]
@@ -133,10 +142,7 @@ def nsgaii(initial_population, num_generations = 100):
    objectives = get_objectives(population)
    for generation in range(num_generations): 
       population, objectives = new_population(population, objectives, make_children(population, generation))
-      print "Generation %d" % generation
-      print population
-      print objectives
-      sys.stdout.flush()
+      log_out(generation, population, objectives)
             
    return population.values()
 
