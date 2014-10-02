@@ -126,9 +126,25 @@ def get_objectives(population):
 
 def log_stdout(generation, population, objectives):
     print "Generation %d" % generation
-    print population
+    for p in population:
+        print p, population[p].genes
     print objectives
     sys.stdout.flush()
+
+class log_file(object):
+    def __init__(self, filename):
+        self.filename = filename
+        f = open(self.filename, 'w')
+        f.close()
+    
+    def log(self, generation, population, objectives):
+        log_stdout(generation, population, objectives)
+        f = open(self.filename, 'a')
+        f.write("Generation %d\n" % generation)
+        for p in population.values():
+            f.write(p.genes.__str__())
+            f.write("\n")
+        f.close()
 
 def log_discard(generation, population, objectives):
     pass
