@@ -99,7 +99,7 @@ def new_population(parents, parents_objectives, children):
 				new_pop_objectives[sorted_by_crowding[i]] = combined_population_objectives[sorted_by_crowding[i]]
 				new_pop_hyperparameters[sorted_by_crowding[i]] = combined_population_hyperparameters[sorted_by_crowding[i]]
 			spaces_remaining = 0
-	return new_pop_hyperparameters, new_pop_objectives	
+	return new_pop_hyperparameters, new_pop_objectives, fronts
 		
 def make_children(parents, generation):
 	children = {}
@@ -124,11 +124,12 @@ def get_objectives(population):
 		objectives[chromosome] = population[chromosome].getObjectives()   
 	return objectives 
 
-def log_stdout(generation, population, objectives):
+def log_stdout(generation, population, objectives, fronts):
     print "Generation %d" % generation
     for p in population:
         print p, population[p].genes
     print objectives
+    print fronts
     sys.stdout.flush()
 
 class log_file(object):
@@ -137,8 +138,8 @@ class log_file(object):
         f = open(self.filename, 'w')
         f.close()
     
-    def log(self, generation, population, objectives):
-        log_stdout(generation, population, objectives)
+    def log(self, generation, population, objectives, fronts):
+        log_stdout(generation, population, objectives, fronts)
         f = open(self.filename, 'a')
         f.write("Generation %d\n" % generation)
         for p in population.values():
@@ -146,7 +147,7 @@ class log_file(object):
             f.write("\n")
         f.close()
 
-def log_discard(generation, population, objectives):
+def log_discard(generation, population, objectives, fronts):
     pass
 
 def nsgaii(initial_population, num_generations = 100, log_out = log_discard):
@@ -157,8 +158,8 @@ def nsgaii(initial_population, num_generations = 100, log_out = log_discard):
    population = dict([poppair(i) for i in range(len(initial_population))])
    objectives = get_objectives(population)
    for generation in range(num_generations): 
-      population, objectives = new_population(population, objectives, make_children(population, generation))
-      log_out(generation, population, objectives)
+      population, objectives, fronts = new_population(population, objectives, make_children(population, generation))
+      log_out(generation, population, objectives, fronts)
             
    return population.values()
 
