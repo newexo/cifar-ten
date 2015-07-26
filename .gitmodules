@@ -1,0 +1,12 @@
+[submodule "demos/DeepLearningTutorials"]
+	path = demos/DeepLearningTutorials
+	url = git@github.com:lisa-lab/DeepLearningTutorials.git
+[submodule "demos/Vulpes"]
+	path = demos/Vulpes
+	url = git@github.com:fsprojects/Vulpes.git
+[submodule "demos/rbm-mnist"]
+	path = demos/rbm-mnist
+	url = git@github.com:jdeng/rbm-mnist.git
+[submodule "demos/pywt"]
+	path = demos/pywt
+	url = git@github.com:nigma/pywt.git

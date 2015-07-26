@@ -9,11 +9,6 @@
 *.pyo
 
 data
-DeepLearningTutorials
-Vulpes
-cuda-convnet-read-only
-rbm-mnist
-pywt
 
 .DS_Store
 

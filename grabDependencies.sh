@@ -49,50 +49,9 @@ function downloadFiles()
     popd
 }
 
-function cloneRepos()
-{
-    pushd .
-    cd demos
-    
-    if [ -e DeepLearningTutorials ]
-    then
-        echo DeepLearningTutorials repo already cloned.
-    else
-        git clone git@github.com:lisa-lab/DeepLearningTutorials.git
-    fi
-    
-    if [ -e Vulpes ]
-    then
-        echo Vulpes repo already cloned.
-    else
-        git clone git@github.com:fsprojects/Vulpes.git
-    fi
-    
-    if [ -e rbm-mnist ]
-    then
-        echo rbm-mnist repo already cloned.
-    else
-        git clone git@github.com:jdeng/rbm-mnist.git
-    fi
-    
-    if [ -e pywt ]
-    then
-        echo pywt repo already cloned.
-    else
-        git clone git@github.com:nigma/pywt.git
-    fi
-    
-    if [ -e cuda-convnet-read-only ]
-    then
-        echo cuda-convnet repo already cloned.
-    else
-        svn checkout http://cuda-convnet.googlecode.com/svn/trunk/ cuda-convnet-read-only
-    fi
-    
-    popd
-}
+git submodule init
+git submodule update
 
 createDirectories
 downloadFiles
-cloneRepos
 
